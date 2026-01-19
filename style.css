@@ -258,7 +258,7 @@ p {
     min-height: 600px;
     display: flex;
     align-items: center;
-    background-image: url('../assets/hero_veronica_cambridge.jpg');
+    background-image: url('hero_veronica_cambridge.jpg');
     background-size: cover;
     background-position: center;
     color: var(--color-white);
