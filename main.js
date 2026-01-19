@@ -28,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                // Optional: Stop observing once visible to run only once
-                // observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
@@ -37,17 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elements to animate
     const animatedElements = document.querySelectorAll('.fade-in, .fade-in-up, .fade-in-left, .fade-in-right');
     animatedElements.forEach(el => {
-        // Reset manual animation classes from CSS to let JS handle trigger if desired, 
-        // or just let them play on load for Hero, and use observer for others.
-        // For simplicity, we just add a 'visible' class trigger.
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
         el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
         observer.observe(el);
     });
 
-    // Add visible class styling dynamically or in CSS
-    // Let's inject a style rule for .visible or assume inline styles are overriden
+    // Add visible class styling dynamically
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
         .visible {
@@ -61,21 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Form Submission to Google Sheets
     const contactForm = document.getElementById('contactForm');
-
-    // ⚠️ PASO 4: PEGAR AQUÍ LA URL QUE OBTUVISTE EN GOOGLE APPS SCRIPT
-    // Debe verse algo así: 'https://script.google.com/macros/s/AKfycbx.../exec'
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLPiZUiDD3Tq7h15H2NmunwatZ7Qdk_OiUWeFWAXRi1IX3fe58c0xkERQTTshQkWyZ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoVQwJpXGLDDW69dmZqszToMbeM6qsYqHyry4OFdiAJJrm8Gu_bTu9B51t38a6e5C6/exec';
 
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const btn = contactForm.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
-
-            if (SCRIPT_URL.includes('PEGAR_AQUI')) {
-                alert('⚠️ Falta configurar la URL. Sigue las instrucciones que te dejé en el chat.');
-                return;
-            }
 
             btn.innerText = 'Enviando...';
             btn.disabled = true;
@@ -87,12 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData
             })
                 .then(() => {
-                    alert('¡Gracias! Tu mensaje ha sido enviado a Veronica correctamente.');
+                    alert('¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaré pronto 😊');
                     contactForm.reset();
                 })
                 .catch(error => {
                     console.error('Error!', error.message);
-                    alert('Hubo un error. Por favor contáctame por WhatsApp.');
+                    alert('Hubo un error al enviar. Por favor intenta por WhatsApp.');
                 })
                 .finally(() => {
                     btn.innerText = originalText;
