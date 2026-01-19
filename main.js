@@ -53,12 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(styleSheet);
 
 
-    // Form Submission to Google Sheets
+    // Form Submission to Google Sheets usando iframe
     const contactForm = document.getElementById('contactForm');
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWbh5-e67IJhSqE_IZBtiqtuSnQxIufxYdvKIeEe2hx452srKlcW2KR-Co-tVhr4ax/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbye1GVTKO-2-juEl9XwTW-Ikth4o12mZqUivrkYqn99GNbR0CC9-8KtGW0gmjO5drpI/exec';
 
     if (contactForm) {
-        contactForm.addEventListener('submit', async (e) => {
+        contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const btn = contactForm.querySelector('button[type="submit"]');
@@ -67,8 +67,20 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerText = 'Enviando...';
             btn.disabled = true;
 
-            // Crear objeto con los datos del formulario
-            const formData = {
+            // Crear iframe oculto para enviar el formulario
+            const iframe = document.createElement('iframe');
+            iframe.name = 'hidden-iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            // Crear formulario temporal
+            const tempForm = document.createElement('form');
+            tempForm.action = SCRIPT_URL;
+            tempForm.method = 'POST';
+            tempForm.target = 'hidden-iframe';
+
+            // Agregar campos
+            const fields = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
@@ -76,28 +88,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 message: document.getElementById('message').value
             };
 
-            console.log('Enviando datos:', formData);
+            for (let key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                tempForm.appendChild(input);
+            }
 
-            try {
-                // Convertir a formato URLSearchParams para Google Apps Script
-                const params = new URLSearchParams(formData);
-                
-                const response = await fetch(SCRIPT_URL + '?' + params.toString(), {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
+            document.body.appendChild(tempForm);
+            tempForm.submit();
 
-                console.log('Respuesta recibida');
+            // Esperar un segundo y mostrar mensaje de éxito
+            setTimeout(() => {
                 alert('¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaré pronto 😊');
                 contactForm.reset();
-                
-            } catch (error) {
-                console.error('Error al enviar:', error);
-                alert('Hubo un error al enviar. Por favor intenta por WhatsApp al +54 9 11 1234-5678');
-            } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
-            }
+                
+                // Limpiar elementos temporales
+                document.body.removeChild(tempForm);
+                document.body.removeChild(iframe);
+            }, 1000);
         });
     }
 
