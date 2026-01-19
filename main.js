@@ -55,35 +55,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Form Submission to Google Sheets
     const contactForm = document.getElementById('contactForm');
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoVQwJpXGLDDW69dmZqszToMbeM6qsYqHyry4OFdiAJJrm8Gu_bTu9B51t38a6e5C6/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWbh5-e67IJhSqE_IZBtiqtuSnQxIufxYdvKIeEe2hx452srKlcW2KR-Co-tVhr4ax/exec';
 
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const btn = contactForm.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
 
             btn.innerText = 'Enviando...';
             btn.disabled = true;
 
-            const formData = new FormData(contactForm);
+            // Crear objeto con los datos del formulario
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                interest: document.getElementById('interest').value,
+                message: document.getElementById('message').value
+            };
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            })
-                .then(() => {
-                    alert('¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaré pronto 😊');
-                    contactForm.reset();
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                    alert('Hubo un error al enviar. Por favor intenta por WhatsApp.');
-                })
-                .finally(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+            console.log('Enviando datos:', formData);
+
+            try {
+                // Convertir a formato URLSearchParams para Google Apps Script
+                const params = new URLSearchParams(formData);
+                
+                const response = await fetch(SCRIPT_URL + '?' + params.toString(), {
+                    method: 'GET',
+                    redirect: 'follow'
                 });
+
+                console.log('Respuesta recibida');
+                alert('¡Gracias! Tu mensaje ha sido enviado correctamente. Te contactaré pronto 😊');
+                contactForm.reset();
+                
+            } catch (error) {
+                console.error('Error al enviar:', error);
+                alert('Hubo un error al enviar. Por favor intenta por WhatsApp al +54 9 11 1234-5678');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         });
     }
 
